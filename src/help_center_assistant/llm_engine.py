@@ -14,7 +14,20 @@ Settings.llm = GoogleGenAI(model="gemini-2.5-flash")
 Settings.embed_model = GoogleGenAIEmbedding()
 
 
-def build_query_agent(role):
+def build_query_engine(role):
     docs = get_permissions(load_data(), role)
     index = VectorStoreIndex.from_documents(docs)
     return index.as_query_engine()
+
+if __name__ == "__main__":
+    question = "do refunds need manager approval"
+
+    for role in ["customer","staff"]:
+        engine = build_query_engine(role)
+        response = engine.query(question)
+        print("*"*10, role.upper(),"*"*10)
+        print(response)
+        print("Sources: ", [n.metadata["file_name"] for n in response.source_nodes])
+
+
+    
